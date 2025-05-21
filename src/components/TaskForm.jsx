@@ -1,48 +1,55 @@
-import React, { useState } from 'react';
-import DatePicker from 'react-datepicker';
-import 'react-datepicker/dist/react-datepicker.css';
+import { useEffect, useState } from "react"
 
+export default function TaskForm ({ onSubmit, initialTask="", initialDateDue="", initialPriority="", onCancel, isEdit }) {  
+  const [todoName, setTodoName] = useState("")
+  const [dateDue, setDateDue] = useState(new Date())
+  const [priority, setPriority] = useState("")
 
-const TaskForm = ({ addTask }) => {
-  const [title, setTitle] = useState('');
-  const [dueDateTime, setDueDateTime] = useState('');
-  const [priority, setPriority] = useState('Low');
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    if (!title) return;
+  useEffect(() => {
+    setTodoName(initialTask)
+    setDateDue(initialDateDue)
+    setPriority(initialPriority)
+  }, [initialTask, initialDateDue, initialPriority])
 
-    const newTask = {
-        title, 
-        dueDateTime: dueDateTime.toString(),
-        priority,
-        completed: false
-    };
+  function handleSubmit(e) {
+    e.preventDefault()
+    if (!todoName || !dateDue || !priority) {
+      alert("Please fill in all fields")
+      return
+    }
 
-    addTask({ newTask });
-    setTitle('');
-    setDueDateTime(new Date());
-    setPriority('Low');
-  };
+    onSubmit(todoName, dateDue, priority)
+    if(!isEdit) {
+      setTodoName("")
+      setDateDue(new Date())
+      setPriority("")
+    }
+  }
 
   return (
-    <form onSubmit={handleSubmit}>
-      <input value={title} onChange={e => setTitle(e.target.value)} placeholder="Task name" required />
-      <DatePicker
-        selected={dueDate}
-        onChange={(date) => setDueDate(date)}
-        showTimeSelect
-        dateFormat="Pp"
-      />
-
-      <select value={priority} onChange={e => setPriority(e.target.value)}>
-        <option value="High">High</option>
-        <option value="Mid">Mid</option>
-        <option value="Low">Low</option>
-      </select>
-
-      <button type="submit">Add Task</button>
-    </form>
-  );
-};
-
-export default TaskForm;
+    <div>
+      <form onSubmit={handleSubmit} className="new-item-form">
+        <div className="form-row">
+          <label htmlFor="item">Item</label>
+          <input type="text" id="item" value={todoName} onChange={e => {setTodoName(e.target.value)}}/>
+        </div>
+        <div className="form-row">
+          <label htmlFor="dateDue">Date Due</label>
+          <input type="datetime-local" id="dateDue" value={dateDue} onChange={e => {setDateDue(e.target.value)}}/>
+        </div>
+        <div className="form-row">
+          <label htmlFor="priority">Priority</label>
+          <select id="priority" value={priority} onChange={e => {setPriority(e.target.value)}}>
+            <option value="" defaultValue={""}>Select Priority</option>
+            <option value="1">Low</option>
+            <option value="2">Medium</option>
+            <option value="3">High</option>
+          </select>
+        </div>
+        <button type="submit" className="btn">
+          {isEdit ? "Update" : "Add"}
+        </button>
+      </form>
+    </div>
+  )
+}
