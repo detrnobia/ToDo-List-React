@@ -1,9 +1,12 @@
-import { TodoItem } from "./TodoItem"
+import { TodoItem } from "./TodoItem";
 
 export function TodoList({ todos, toggleTodo, deleteTodo, editTodo }) {
+  // Sort tasks: incomplete tasks first, completed tasks last
+  const sortedTodos = [...todos].sort((a, b) => a.completed - b.completed);
+
   return (
     <ul className="todo-list">
-      {todos.map((todo) => (
+      {sortedTodos.map((todo) => (
         <TodoItem
           key={todo.id}
           id={todo.id}
